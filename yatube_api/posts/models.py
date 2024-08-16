@@ -3,6 +3,8 @@ from django.db import models
 
 User = get_user_model()
 
+STR_LIMIT = 21
+
 
 class Group(models.Model):
     title = models.CharField(max_length=200)
@@ -30,7 +32,7 @@ class Post(models.Model):
     )
 
     def __str__(self):
-        return self.text
+        return f'{self.text[:STR_LIMIT]}'
 
 
 class Comment(models.Model):

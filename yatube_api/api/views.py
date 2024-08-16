@@ -2,14 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 
-from posts.models import Post, Group, User
-from .serializers import (PostSerializer, GroupSerializer,
-                          CommentSerializer, UserSerializer)
-
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+from api.serializers import (PostSerializer, GroupSerializer,
+                          CommentSerializer)
+from posts.models import Post, Group
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -38,16 +33,19 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
+    def get_post(self):
+        return get_object_or_404(Post, id=self.kwargs.get('post_id'))
+
     def get_queryset(self):
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
+        post = self.get_post()
         return post.comments.all()
 
     def perform_create(self, serializer):
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
+        post = self.get_post()
         serializer.save(author=self.request.user, post=post)
 
     def perform_update(self, serializer):
-        post = get_object_or_404(Post, id=self.kwargs.get('post_id'))
+        post = self.get_post()
         comment = self.get_object()
         if comment.author != self.request.user:
             raise PermissionDenied('Изменение чужого контента запрещено!')
