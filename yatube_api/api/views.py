@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 
 from api.serializers import (PostSerializer, GroupSerializer,
-                          CommentSerializer)
+                             CommentSerializer)
 from posts.models import Post, Group
 
 
